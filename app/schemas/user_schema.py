@@ -1,4 +1,6 @@
-from marshmallow import Schema, fields, validate, ValidationError
+# app/schemas/user_schema.py
+from marshmallow import Schema, fields, validate
+
 
 class UserRegisterSchema(Schema):
     """Schema para registro de usuario"""
@@ -9,19 +11,26 @@ class UserRegisterSchema(Schema):
     )
     email = fields.Email(
         required=True,
-        error_messages={'required': 'El email es requerido', 'invalid': 'Email inválido'}
+        error_messages={
+            'required': 'El email es requerido',
+            'invalid': 'Email inválido'
+        }
     )
     password = fields.Str(
         required=True,
         validate=validate.Length(min=6),
-        error_messages={'required': 'La contraseña es requerida', 
-                       'validator_failed': 'La contraseña debe tener al menos 6 caracteres'}
+        error_messages={
+            'required': 'La contraseña es requerida',
+            'validator_failed': 'La contraseña debe tener al menos 6 caracteres'
+        }
     )
+
 
 class UserLoginSchema(Schema):
     """Schema para login de usuario"""
     email = fields.Email(required=True)
     password = fields.Str(required=True)
+
 
 class UserResponseSchema(Schema):
     """Schema para respuesta de usuario"""
@@ -29,4 +38,5 @@ class UserResponseSchema(Schema):
     username = fields.Str()
     email = fields.Email()
     created_at = fields.Str()
+
 

@@ -1,7 +1,7 @@
 from functools import wraps
 from flask import request, jsonify
 from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
-import json
+
 
 def handle_errors(f):
     """
@@ -20,6 +20,7 @@ def handle_errors(f):
             return jsonify({'error': 'Error interno del servidor'}), 500
     
     return decorated
+
 
 def validate_request_data(*required_fields):
     """
@@ -50,6 +51,7 @@ def validate_request_data(*required_fields):
     
     return decorator
 
+
 def require_auth(f):
     """
     Decorador simplificado para requerir autenticación JWT.
@@ -67,6 +69,7 @@ def require_auth(f):
     
     return decorated
 
+
 def ensure_json_content_type(f):
     """
     Decorador para asegurar que el request tiene Content-Type: application/json
@@ -80,6 +83,7 @@ def ensure_json_content_type(f):
         return f(*args, **kwargs)
     
     return decorated
+
 
 class Response:
     """
@@ -135,6 +139,7 @@ class Response:
         """Respuesta solicitud inválida (400)"""
         return Response.error(message=message, status_code=400, details=details)
 
+
 class Pagination:
     """
     Clase de utilidad para manejar paginación en listados.
@@ -145,7 +150,13 @@ class Pagination:
         """
         Pagina una query de SQLAlchemy.
         
-        Retorna: (items, total, page, pages)
+        Retorna diccionario con:
+        - items: lista de items
+        - total: total de items
+        - page: página actual
+        - pages: total de páginas
+        - has_next: si hay siguiente página
+        - has_prev: si hay página anterior
         """
         paginated = query.paginate(page=page, per_page=per_page, error_out=False)
         

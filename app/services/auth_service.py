@@ -1,8 +1,6 @@
-import requests
 from app import db
-from app.models import User, Movie
-from flask import current_app
-from sqlalchemy.exc import IntegrityError
+from app.models.user import User
+
 
 class AuthService:
     """Servicio de autenticación"""

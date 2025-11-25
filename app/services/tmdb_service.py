@@ -1,8 +1,6 @@
 import requests
-from app import db
-from app.models import User, Movie
 from flask import current_app
-from sqlalchemy.exc import IntegrityError
+
 
 class TMDbService:
     """Servicio para consumir API de TheMovieDB (TMDB)"""
@@ -48,7 +46,8 @@ class TMDbService:
             
             return results
         
-        except requests.exceptions.RequestException:
+        except requests.exceptions.RequestException as e:
+            current_app.logger.error(f'Error searching TMDB: {str(e)}')
             return []
     
     @staticmethod
@@ -73,7 +72,8 @@ class TMDbService:
             
             return response.json()
         
-        except requests.exceptions.RequestException:
+        except requests.exceptions.RequestException as e:
+            current_app.logger.error(f'Error getting TMDB details: {str(e)}')
             return None
     
     @staticmethod

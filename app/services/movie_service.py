@@ -1,9 +1,7 @@
-import requests
-import TMDbservice
 from app import db
-from app.models import User, Movie
-from flask import current_app
-from sqlalchemy.exc import IntegrityError
+from app.models.movie import Movie
+from app.services.tmdb_service import TMDbService
+
 
 class MovieService:
     """Servicio de películas"""
@@ -75,4 +73,3 @@ class MovieService:
         db.session.commit()
         
         return True
-

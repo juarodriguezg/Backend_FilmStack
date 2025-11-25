@@ -1,3 +1,4 @@
+# app/__init__.py
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
@@ -28,13 +29,61 @@ def create_app(config_name='development'):
     with app.app_context():
         db.create_all()
     
-    # Manejo de errores global
-    @app.errorhandler(404)
-    def not_found(error):
-        return {'error': 'Recurso no encontrado'}, 404
-    
-    @app.errorhandler(500)
-    def internal_error(error):
-        return {'error': 'Error interno del servidor'}, 500
-    
     return app
+
+# app/models/__init__.py
+from app.models.user import User
+from app.models.movie import Movie
+
+__all__ = ['User', 'Movie']
+
+# app/routes/__init__.py
+from app.routes.auth import auth_bp
+from app.routes.movies import movies_bp
+
+__all__ = ['auth_bp', 'movies_bp']
+
+# app/schemas/__init__.py
+from app.schemas.user_schema import (
+    UserRegisterSchema,
+    UserLoginSchema,
+    UserResponseSchema
+)
+from app.schemas.movie_schema import (
+    MovieCreateSchema,
+    MovieResponseSchema
+)
+
+__all__ = [
+    'UserRegisterSchema',
+    'UserLoginSchema',
+    'UserResponseSchema',
+    'MovieCreateSchema',
+    'MovieResponseSchema'
+]
+
+# app/services/__init__.py
+from app.services.auth_service import AuthService
+from app.services.movie_service import MovieService
+from app.services.tmdb_service import TMDbService
+
+__all__ = ['AuthService', 'MovieService', 'TMDbService']
+
+# app/utils/__init__.py
+from app.utils.utils import (
+    Response,
+    Pagination,
+    handle_errors,
+    validate_request_data,
+    require_auth,
+    ensure_json_content_type
+)
+
+__all__ = [
+    'Response',
+    'Pagination',
+    'handle_errors',
+    'validate_request_data',
+    'require_auth',
+    'ensure_json_content_type'
+]

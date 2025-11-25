@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields, validate, ValidationError
+from marshmallow import Schema, fields, validate
 
 class MovieCreateSchema(Schema):
     """Schema para crear/actualizar película"""
@@ -23,6 +23,7 @@ class MovieCreateSchema(Schema):
         error_messages={'required': 'El género es requerido'}
     )
     tmdb_id = fields.Str(allow_none=True)
+
 
 class MovieResponseSchema(Schema):
     """Schema para respuesta de película"""

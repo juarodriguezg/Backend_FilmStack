@@ -10,6 +10,7 @@ movie_create_schema = MovieCreateSchema()
 movie_response_schema = MovieResponseSchema()
 movies_response_schema = MovieResponseSchema(many=True)
 
+
 @movies_bp.route('/search', methods=['GET'])
 def search_movies():
     """Endpoint para buscar películas en TheMovieDB (TMDB)"""
@@ -17,14 +18,24 @@ def search_movies():
         title = request.args.get('title')
         
         if not title or len(title) < 1:
-            return jsonify({'error': 'El título es requerido'}), 400
+            return jsonify({
+                'success': False,
+                'error': 'El título es requerido'
+            }), 400
         
         results = TMDbService.search_movies(title)
         
-        return jsonify({'results': results}), 200
+        return jsonify({
+            'success': True,
+            'results': results
+        }), 200
     
     except Exception as err:
-        return jsonify({'error': 'Error al buscar películas'}), 500
+        return jsonify({
+            'success': False,
+            'error': 'Error al buscar películas'
+        }), 500
+
 
 @movies_bp.route('/', methods=['POST'])
 @jwt_required()
@@ -40,18 +51,27 @@ def create_movie():
             year=data['year'],
             director=data['director'],
             genre=data['genre'],
-            imdb_id=data.get('imdb_id')
+            tmdb_id=data.get('tmdb_id')
         )
         
         return jsonify({
+            'success': True,
             'message': 'Película creada exitosamente',
-            'movie': movie_response_schema.dump(movie)
+            'data': movie_response_schema.dump(movie)
         }), 201
     
     except ValidationError as err:
-        return jsonify({'errors': err.messages}), 400
+        return jsonify({
+            'success': False,
+            'error': 'Validación fallida',
+            'details': err.messages
+        }), 400
     except Exception as err:
-        return jsonify({'error': 'Error al crear película'}), 500
+        return jsonify({
+            'success': False,
+            'error': 'Error al crear película'
+        }), 500
+
 
 @movies_bp.route('/', methods=['GET'])
 @jwt_required()
@@ -62,12 +82,19 @@ def get_movies():
         movies = MovieService.get_user_movies(user_id)
         
         return jsonify({
-            'movies': movies_response_schema.dump(movies),
-            'total': len(movies)
+            'success': True,
+            'data': {
+                'movies': movies_response_schema.dump(movies),
+                'total': len(movies)
+            }
         }), 200
     
     except Exception as err:
-        return jsonify({'error': 'Error al obtener películas'}), 500
+        return jsonify({
+            'success': False,
+            'error': 'Error al obtener películas'
+        }), 500
+
 
 @movies_bp.route('/<int:movie_id>', methods=['GET'])
 @jwt_required()
@@ -78,12 +105,22 @@ def get_movie(movie_id):
         movie = MovieService.get_movie_by_id(movie_id, user_id)
         
         if not movie:
-            return jsonify({'error': 'Película no encontrada'}), 404
+            return jsonify({
+                'success': False,
+                'error': 'Película no encontrada'
+            }), 404
         
-        return jsonify(movie_response_schema.dump(movie)), 200
+        return jsonify({
+            'success': True,
+            'data': movie_response_schema.dump(movie)
+        }), 200
     
     except Exception as err:
-        return jsonify({'error': 'Error al obtener película'}), 500
+        return jsonify({
+            'success': False,
+            'error': 'Error al obtener película'
+        }), 500
+
 
 @movies_bp.route('/<int:movie_id>', methods=['PUT'])
 @jwt_required()
@@ -96,17 +133,29 @@ def update_movie(movie_id):
         movie = MovieService.update_movie(movie_id, user_id, **data)
         
         if not movie:
-            return jsonify({'error': 'Película no encontrada'}), 404
+            return jsonify({
+                'success': False,
+                'error': 'Película no encontrada'
+            }), 404
         
         return jsonify({
+            'success': True,
             'message': 'Película actualizada exitosamente',
-            'movie': movie_response_schema.dump(movie)
+            'data': movie_response_schema.dump(movie)
         }), 200
     
     except ValidationError as err:
-        return jsonify({'errors': err.messages}), 400
+        return jsonify({
+            'success': False,
+            'error': 'Validación fallida',
+            'details': err.messages
+        }), 400
     except Exception as err:
-        return jsonify({'error': 'Error al actualizar película'}), 500
+        return jsonify({
+            'success': False,
+            'error': 'Error al actualizar película'
+        }), 500
+
 
 @movies_bp.route('/<int:movie_id>', methods=['DELETE'])
 @jwt_required()
@@ -117,9 +166,18 @@ def delete_movie(movie_id):
         success = MovieService.delete_movie(movie_id, user_id)
         
         if not success:
-            return jsonify({'error': 'Película no encontrada'}), 404
+            return jsonify({
+                'success': False,
+                'error': 'Película no encontrada'
+            }), 404
         
-        return jsonify({'message': 'Película eliminada exitosamente'}), 200
+        return jsonify({
+            'success': True,
+            'message': 'Película eliminada exitosamente'
+        }), 200
     
     except Exception as err:
-        return jsonify({'error': 'Error al eliminar película'}), 500
+        return jsonify({
+            'success': False,
+            'error': 'Error al eliminar película'
+        }), 500
