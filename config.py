@@ -10,8 +10,8 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'jwt-secret-key-change-in-production')
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=24)
-    OMDB_API_KEY = os.getenv('OMDB_API_KEY', '')
-    CORS_ORIGINS = os.getenv('CORS_ORIGINS', 'http://localhost:3000')
+    TMDB_API_KEY = os.getenv('TMDB_API_KEY', '')
+    CORS_ORIGINS = os.getenv('CORS_ORIGINS', '*')
 
 class DevelopmentConfig(Config):
     """Configuración para desarrollo"""
