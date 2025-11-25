@@ -1,0 +1,47 @@
+steps:
+  # Paso 1: Compilar imagen Docker
+  - name: 'gcr.io/cloud-builders/docker'
+    args: 
+      - 'build'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REPO}/movies-api:${SHORT_SHA}'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REPO}/movies-api:latest'
+      - '.'
+
+  # Paso 2: Enviar imagen a Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REPO}/movies-api:${SHORT_SHA}'
+
+  # Paso 3: Desplegar en Cloud Run
+  - name: 'gcr.io/cloud-builders/gke-deploy'
+    args:
+      - 'run'
+      - '--filename=.'
+      - '--image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REPO}/movies-api:${SHORT_SHA}'
+      - '--location=${_REGION}'
+      - '--cluster=movies-cluster'
+
+  # Paso 4: Desplegar en Cloud Run (alternativa simple)
+  - name: 'gcr.io/cloud-builders/run'
+    args:
+      - 'deploy'
+      - 'movies-api'
+      - '--image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REPO}/movies-api:${SHORT_SHA}'
+      - '--region=${_REGION}'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--set-env-vars=FLASK_ENV=production'
+
+images:
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REPO}/movies-api:${SHORT_SHA}'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REPO}/movies-api:latest'
+
+substitutions:
+  _REGION: 'us-central1'
+  _ARTIFACT_REPO: 'docker-repo'
+
+options:
+  machineType: 'N1_HIGHCPU_8'

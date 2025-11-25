@@ -5,16 +5,16 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
-    """Configuración base de la aplicación"""
-    SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
+    """Configuración base"""
+    SECRET_KEY = os.getenv('SECRET_KEY')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'jwt-secret-key-change-in-production')
+    JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=24)
     TMDB_API_KEY = os.getenv('TMDB_API_KEY', '')
     CORS_ORIGINS = os.getenv('CORS_ORIGINS', 'http://localhost:3000')
 
 class DevelopmentConfig(Config):
-    """Configuración para desarrollo"""
+    """Desarrollo"""
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.getenv(
         'DATABASE_URL',
@@ -22,12 +22,18 @@ class DevelopmentConfig(Config):
     )
 
 class ProductionConfig(Config):
-    """Configuración para producción"""
+    """Producción"""
     DEBUG = False
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
+    # Deshabilitar creación automática de tablas
+    SQLALCHEMY_CREATE_ENGINE_KWARGS = {
+        'connect_args': {
+            'sslmode': 'require'
+        }
+    }
 
 class TestingConfig(Config):
-    """Configuración para pruebas"""
+    """Testing"""
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=5)
